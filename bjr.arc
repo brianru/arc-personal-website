@@ -43,22 +43,18 @@
              (link "contact" "mailto:brianrubinton@gmail.com"))))
 
 (mac mainpage body
-  ; TODO
-  ; in head:
-  ;     css
-  ;     favicon
-  ;     d3 script
-  ;     title
-  ; in body:
-  ;     pass it in "body"
-  `(whitepage
-     (center
-       (widtable 600
-         (tag b
-         (spacerow 10)
-         ,@body
-         (spacerow 30)
-         (footer))))))
+  `(tag html
+    (tag head
+      (gen-css-url)
+      (prn "<meta name=\"viewport\" content=\"width=device-width\">"))
+    (tag body
+      (center
+        (widtable 600
+          (tag b
+          (spacerow 10)
+          ,@body
+          (spacerow 30)
+          (footer)))))))
 
 
 (def gen-css-url ()
@@ -81,16 +77,20 @@
            (footer))))))
 
 (mac blogpage body
-  `(whitepage
-     (center
-       (widtable 600
-         (tag b (link blogtitle* "blog")) ; replace with navbar
-         (br 3)
-         ,@body
-         (br 1)
-         (w/bars (link "archive")
-                 (link "new post" "newpost"))))
-         (footer)))
+  `(tag html
+    (tag head
+      (gen-css-url)
+      (prn "<meta name=\"viewport\" content=\"width=device-width\">"))
+    (tag body
+      (center
+        (widtable 600
+          (tag b (link blogtitle* "blog")) ; replace with navbar
+          (br 3)
+          ,@body
+          (br 1)
+          (w/bars (link "archive")
+                  (link "new post" "newpost"))))
+          (footer))))
 
 (defop viewpost req (blogop post-page req))
 
@@ -164,7 +164,11 @@
     (spacerow 10)
     (tr (tdc (prn "Please return often for updates.")))))
 
-(= testcss* ".graph1 { position: relative }")
+(= testcss*
+  "
+  body { font: sans-serif }
+  .graph1 { position: relative }
+  ")
 
 (defop data.css req
   (pr testcss*))
