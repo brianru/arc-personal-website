@@ -72,6 +72,7 @@
 (mac datapage body
   `(tag html
      (tag head
+       (gen-css-url)
        (prn "<meta name=\"viewport\" content=\"width=device-width\">"))
      (tag body
        (center 
@@ -149,24 +150,24 @@
 
 (defop data req
   (datapage 
-    (prn linegraph*)))  
+    (graph 300 100 "https://dl.dropboxusercontent.com/u/641880/spending.csv")))
 
 (= headshot-url "https://www.hackerschool.com/assets/people/brian_j_rubinton_150-f50597c1fa1d911d6d13719e9e396446.jpg")
 
 (defop || req 
   (mainpage
-      (gentag img src headshot-url border 0 vspace 3 hspace 2)
-      (tr (tdc (prn "Hi! I'm Brian. Welcome to my website.")))
-      (spacerow 10)
-      (tr (tdc (prn "In this very corner of the internet, I am constructing")))
-      (tr (tdc (prn "a personal analytics webservice with Arc.")))
-      (spacerow 10)
-      (tr (tdc (prn "Please return often for updates.")))))
-      ; factor out welcome message
-      ; (tr
-      ;   (td (stackedbar books.csv))
-      ;   (td (linegraph transactions.csv))
-      ;   (td (multilinegraph fitbit.csv)))
+    (gentag img src headshot-url border 0 vspace 3 hspace 2)
+    (tr (tdc (prn "Hi! I'm Brian. Welcome to my website.")))
+    (spacerow 10)
+    (tr (tdc (prn "In this very corner of the internet, I am constructing")))
+    (tr (tdc (prn "a personal analytics webservice with Arc.")))
+    (spacerow 10)
+    (tr (tdc (prn "Please return often for updates.")))))
+
+(= testcss* ".graph1 { position: relative }")
+
+(defop data.css req
+  (pr testcss*))
 
 (def bsv ()
   (ensure-dir postdir*)
