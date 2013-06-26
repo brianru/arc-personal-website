@@ -1,13 +1,17 @@
 ; Blog tool example.  20 Jan 08, rev 21 May 09.
+; Repurposed for personal analytics hacking.
 
 ; To run:
-; arc> (load "lib/blog.arc")
+; arc> (load "lib/bjr.arc")
 ; arc> (bsv)
-; go to http://localhost:8080/blog
+; go to http://localhost:8080/
 
-(= postdir* "data/posts/"  maxid* 0  posts* (table))
+(= postdir* "bjr/posts/"  maxid* 0  posts* (table))
 
 (= blogtitle* "Brian's Blog")
+
+(require "lib/re.arc")
+(require "../feedback/graphs.arc")
 
 (deftem post  id nil  title nil  text nil)
 
@@ -20,16 +24,72 @@
 
 (def post (id) (posts* (errsafe:int id)))
 
+(= green (color 10 200 75))
+
+(def color-stripe (c)
+  (tag (table width 600 cellspacing 0 cellpadding 1)
+    (tr (tdcolor c))))
+
+(mac footer nil
+  `(center
+     (color-stripe green)
+     (br 1)
+     (w/bars (link "home" "/")
+             (link "blog" "blog")
+             (link "github" "https://github.com/brianru/")
+             (link "twitter" "https://twitter.com/brianru")
+             (link "linkedin"
+                   "http://www.linkedin.com/pub/brian-j-rubinton/13/216/804")
+             (link "contact" "mailto:brianrubinton@gmail.com"))))
+
+(mac mainpage body
+  ; TODO
+  ; in head:
+  ;     css
+  ;     favicon
+  ;     d3 script
+  ;     title
+  ; in body:
+  ;     pass it in "body"
+  `(whitepage
+     (center
+       (widtable 600
+         (tag b
+         (spacerow 10)
+         ,@body
+         (spacerow 30)
+         (footer))))))
+
+
+(def gen-css-url ()
+  (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"data.css\">"))
+
+; TODO
+; defop data
+; just display the graphs
+; pass the body of this to mainpage once it works
+; then get the formatting right
+(mac datapage body
+  `(tag html
+     (tag head
+       (prn "<meta name=\"viewport\" content=\"width=device-width\">"))
+     (tag body
+       (center 
+         (widtable 600
+           ,@body
+           (footer))))))
+
 (mac blogpage body
   `(whitepage
      (center
        (widtable 600
-         (tag b (link blogtitle* "blog"))
+         (tag b (link blogtitle* "blog")) ; replace with navbar
          (br 3)
          ,@body
-         (br 3)
+         (br 1)
          (w/bars (link "archive")
-                 (link "new post" "newpost"))))))
+                 (link "new post" "newpost"))))
+         (footer)))
 
 (defop viewpost req (blogop post-page req))
 
@@ -48,7 +108,7 @@
     (sp)
     (link "[edit]" (string "editpost?id=" p!id)))
   (br2)
-  (pr p!text))
+  (pr (re-replace "\r\n" p!text "<br>")))
 
 (defopl newpost req
   (whitepage
@@ -86,6 +146,27 @@
         (awhen (posts* (- maxid* i))
           (display-post user it)
           (br 3))))))
+
+(defop data req
+  (datapage 
+    (prn linegraph*)))  
+
+(= headshot-url "https://www.hackerschool.com/assets/people/brian_j_rubinton_150-f50597c1fa1d911d6d13719e9e396446.jpg")
+
+(defop || req 
+  (mainpage
+      (gentag img src headshot-url border 0 vspace 3 hspace 2)
+      (tr (tdc (prn "Hi! I'm Brian. Welcome to my website.")))
+      (spacerow 10)
+      (tr (tdc (prn "In this very corner of the internet, I am constructing")))
+      (tr (tdc (prn "a personal analytics webservice with Arc.")))
+      (spacerow 10)
+      (tr (tdc (prn "Please return often for updates.")))))
+      ; factor out welcome message
+      ; (tr
+      ;   (td (stackedbar books.csv))
+      ;   (td (linegraph transactions.csv))
+      ;   (td (multilinegraph fitbit.csv)))
 
 (def bsv ()
   (ensure-dir postdir*)
