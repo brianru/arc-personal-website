@@ -150,7 +150,8 @@
 
 (defop data req
   (datapage 
-    (graph 300 100 "https://dl.dropboxusercontent.com/u/641880/spending.csv")))
+    (graph :line 300 100 "https://dl.dropboxusercontent.com/u/641880/spending.csv")
+    (graph :bar 300 100 "https://dl.dropboxusercontent.com/u/641880/reading.csv")))
 
 (= headshot-url "https://www.hackerschool.com/assets/people/brian_j_rubinton_150-f50597c1fa1d911d6d13719e9e396446.jpg")
 

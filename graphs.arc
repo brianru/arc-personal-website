@@ -6,21 +6,20 @@
 ; 
 
 ;(mac graph ((graphtype :line) (width 300) (height 100) (data sample-data*)))
-(mac graph (width height data)
-  `(let v (tostring (graphpage ,width ,height ,data))
+(mac graph (:gtype width height data)
+  `(let v (tostring (graphpage ,:gtype ,width ,height ,data))
     (tag (div class "graph1") (pr v))))
-    ;(tag (iframe srcdoc v))))
 
-(mac graphpage (width height data)
+(mac graphpage (gtype width height data)
   `(string
     (doctype "html")
     (charset "utf-8")
     (tag style
-      (pr graphcss*))
+      (pr bargraphcss*))
     (tag body
       (include-d3)
       (tag script 
-        (pr (graphscript ,width ,height ,data))))))
+        (pr (bargraphscript ,width ,height ,data))))))
 
 ; build-out to be more controlled -- take variables for specific types
 (mac doctype (x)
@@ -32,7 +31,7 @@
 (mac include-d3 ()
   `(tag (script src "http://d3js.org/d3.v3.js")))
 
-(= graphcss* 
+(= linegraphcss* 
   "
   body {
     font: 10px sans-serif;
@@ -56,7 +55,29 @@
   }
   ")
 
-(mac graphscript (width height data)
+(= bargraphcss*
+  "
+  body {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .bar {
+    fill: steelblue;
+  }
+
+  .x.axis path {
+    display: none;
+  }
+  ")
+
+(mac linegraphscript (width height data)
   `(string "
           var margin = {top: 20, right: 20, bottom: 30, left: 50},
               width = " ,width " - margin.left - margin.right,
@@ -93,8 +114,6 @@
               };
           }, function(error, rows) {
            
-            console.log(rows);
-           
             x.domain(d3.extent(rows, function(d) { return d.day; }));
             y.domain(d3.extent(rows, function(d) { return d.avg; })); 
             
@@ -118,6 +137,69 @@
                 .attr('class', 'line')
                 .attr('d', line);
            
+          });"))
+
+(mac bargraphscript (width height data)
+  `(string "
+          margin = {top: 20, right: 20, bottom: 30, left: 40},
+              width = " ,width " - margin.left - margin.right,
+              height = " ,height " - margin.top - margin.bottom;
+
+          var formatPercent = d3.format('.0%');
+
+          var x = d3.scale.ordinal()
+              .rangeRoundBands([0, width], .1);
+
+          var y = d3.scale.linear()
+              .range([height, 0]);
+
+          var xAxis = d3.svg.axis()
+              .scale(x)
+              .orient('bottom');
+
+          var yAxis = d3.svg.axis()
+              .scale(y)
+              .orient('left')
+              .tickFormat(formatPercent);
+
+          var svg = d3.select('body').append('svg')
+              .attr('width', width + margin.left + margin.right)
+              .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+              .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+          d3.csv('" ,data "', function(error, data) {
+
+            data.forEach(function(d) {
+              d.books = +d.books;
+            });
+
+            x.domain(data.map(function(d) { return d.month; }));
+            y.domain([0, d3.max(data, function(d) { return d.books; })]);
+
+            svg.append('g')
+                .attr('class', 'x axis')
+                .attr('transform', 'translate(0,' + height + ')')
+                .call(xAxis);
+
+            svg.append('g')
+                .attr('class', 'y axis')
+                .call(yAxis)
+              .append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 6)
+                .attr('dy', '.71em')
+                .style('text-anchor', 'end')
+                .text('Number of books');
+
+            svg.selectAll('.bar')
+                .data(data)
+              .enter().append('rect')
+                .attr('class', 'bar')
+                .attr('x', function(d) { return x(d.month); })
+                .attr('width', x.rangeBand())
+                .attr('y', function(d) { return y(d.books); })
+                .attr('height', function(d) { return height - y(d.books); });
           });"))
 
 ; (mac barchart ((data "sample.csv") (width 300) (height 100)) ___)
