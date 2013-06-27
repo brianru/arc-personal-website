@@ -41,16 +41,17 @@
     (tr (tdcolor c))))
 
 (mac footer nil
-  `(center
-     (color-stripe green)
-     (br 1)
-     (w/bars (link "home" "/")
-             (link "blog" "blog")
-             (link "github" "https://github.com/brianru/")
-             (link "twitter" "https://twitter.com/brianru")
-             (link "linkedin"
-                   "http://www.linkedin.com/pub/brian-j-rubinton/13/216/804")
-             (link "contact" "mailto:brianrubinton@gmail.com"))))
+  `(tag footer 
+     (center
+       (color-stripe green)
+       (br 1)
+       (w/bars (link "home" "/")
+               (link "blog" "blog")
+               (link "github" "https://github.com/brianru/")
+               (link "twitter" "https://twitter.com/brianru")
+               (link "linkedin"
+                     "http://www.linkedin.com/pub/brian-j-rubinton/13/216/804")
+               (link "contact" "mailto:brianrubinton@gmail.com")))))
 
 (mac mainpage body
   `(tag html
@@ -61,8 +62,8 @@
           (tag b
           (spacerow 10)
           ,@body
-          (spacerow 30)
-          (footer)))))))
+          (spacerow 30)))))
+    (footer)))
 
 ; TODO
 ; defop data
@@ -75,8 +76,8 @@
      (tag body
        (center 
          (widtable 600
-           ,@body
-           (footer))))))
+           ,@body)))
+     (footer)))
 
 (mac blogpage body
   `(tag html
@@ -89,8 +90,8 @@
           ,@body
           (br 1)
           (w/bars (link "archive")
-                  (link "new post" "newpost"))))
-          (footer))))
+                  (link "new post" "newpost")))))
+    (footer)))
 
 (defop viewpost req (blogop post-page req))
 
