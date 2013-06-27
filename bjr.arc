@@ -26,6 +26,16 @@
 
 (= green (color 10 200 75))
 
+(def gen-css-url ()
+  (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"data.css\">"))
+
+(mac header nil
+  `(tag head
+    (gen-css-url)
+    (gentag meta name "viewport" content "width=device-width")
+    (tag (script type "text/javscript" src "//use.typekit.net/gkp2xrv.js"))
+    (tag (script type "text/javascript") (pr "try{Typekit.load();}catch(e){}"))))
+    
 (def color-stripe (c)
   (tag (table width 600 cellspacing 0 cellpadding 1)
     (tr (tdcolor c))))
@@ -44,9 +54,7 @@
 
 (mac mainpage body
   `(tag html
-    (tag head
-      (gen-css-url)
-      (prn "<meta name=\"viewport\" content=\"width=device-width\">"))
+    (header)
     (tag body
       (center
         (widtable 600
@@ -56,10 +64,6 @@
           (spacerow 30)
           (footer)))))))
 
-
-(def gen-css-url ()
-  (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"data.css\">"))
-
 ; TODO
 ; defop data
 ; just display the graphs
@@ -67,9 +71,7 @@
 ; then get the formatting right
 (mac datapage body
   `(tag html
-     (tag head
-       (gen-css-url)
-       (prn "<meta name=\"viewport\" content=\"width=device-width\">"))
+     (header)
      (tag body
        (center 
          (widtable 600
@@ -78,9 +80,7 @@
 
 (mac blogpage body
   `(tag html
-    (tag head
-      (gen-css-url)
-      (prn "<meta name=\"viewport\" content=\"width=device-width\">"))
+    (header)
     (tag body
       (center
         (widtable 600
@@ -150,8 +150,11 @@
 
 (defop data req
   (datapage 
-    (graph :line 300 100 "https://dl.dropboxusercontent.com/u/641880/spending.csv")
-    (graph :bar 300 100 "https://dl.dropboxusercontent.com/u/641880/reading.csv")))
+    (graph "\"spending-graph\"" "line" 300 100
+           "https://dl.dropboxusercontent.com/u/641880/spending.csv")
+    (br)
+    (graph "\"reading-graph\"" "bar" 300 100
+           "https://dl.dropboxusercontent.com/u/641880/reading.csv")))
 
 (= headshot-url "https://www.hackerschool.com/assets/people/brian_j_rubinton_150-f50597c1fa1d911d6d13719e9e396446.jpg")
 
@@ -167,8 +170,8 @@
 
 (= testcss*
   "
-  body { font: sans-serif }
-  .graph1 { position: relative }
+  div#spending-graph { display: inline }
+  div#reading-graph { display: inline }
   ")
 
 (defop data.css req
