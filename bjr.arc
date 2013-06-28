@@ -8,7 +8,9 @@
 
 (= postdir* "bjr/posts/"  maxid* 0  posts* (table))
 
-(= blogtitle* "Brian's Blog")
+(= blogtitle* "Brian's Blog"
+   site-url* "http://www.bjr.tw"
+   site-desc* "This is Brian's blog!")
 
 (require "lib/re.arc")
 (require "../feedback/graphs.arc")
@@ -111,7 +113,10 @@
     (sp)
     (link "[edit]" (string "editpost?id=" p!id)))
   (br2)
-  (pr (re-replace "\r\n" p!text "<br>")))
+  (pr (htmlbr p!text)))
+
+(def htmlbr (text)
+  (re-replace "\r\n" text "<br>"))
 
 (defopl newpost req
   (whitepage
@@ -149,6 +154,24 @@
         (awhen (posts* (- maxid* i))
           (display-post user it)
           (br 3))))))
+
+
+(def rsspage (req)
+  (tag (rss version "2.0")
+    (tag channel
+      (tag title (pr blogtitle*))
+      (tag link (pr site-url*))
+      (tag description (pr site-desc*))
+      (for i 0 maxid*
+        (awhen (posts* (- maxid* i))
+          (tag item
+            (tag title (pr (eschtml it!title)))
+            (tag link (pr (+ site-url* "/blog/" (permalink it))))
+            (tag guid (pr (+ site-url* "/blog/" (permalink it))))
+            (tag description (pr (htmlbr it!text)))))))))
+
+(defop rss req 
+  (rsspage nil))
 
 (defop data req
   (datapage 
