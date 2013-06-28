@@ -29,7 +29,7 @@
 (def gen-css-url ()
   (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"data.css\">"))
 
-(mac header nil
+(mac header nil 
   `(tag head
     (gen-css-url)
     (gentag meta name "viewport" content "width=device-width")
@@ -74,9 +74,10 @@
   `(tag html
      (header)
      (tag body
+       (include-d3)
        (center 
-         (widtable 600
-           ,@body)))
+         ;(widtable 600 ;integrate a custom table solution?
+           ,@body));)
      (footer)))
 
 (mac blogpage body
@@ -153,7 +154,6 @@
   (datapage 
     (graph "\"spending-graph\"" "line" 300 100
            "https://dl.dropboxusercontent.com/u/641880/spending.csv")
-    (br)
     (graph "\"reading-graph\"" "bar" 300 100
            "https://dl.dropboxusercontent.com/u/641880/reading.csv")))
 
